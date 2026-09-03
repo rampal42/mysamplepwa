@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Simple PWA</title>
+
+  <!-- Link to CSS -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Link to manifest -->
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- Theme color for mobile browser UI -->
+  <meta name="theme-color" content="#2196f3" />
+</head>
+<body>
+  <header>
+    <h1>My Simple PWA</h1>
+  </header>
+
+  <main>
+    <p>This is a simple Progressive Web App.</p>
+    <button id="clickMe">Tap me</button>
+    <p id="output"></p>
+  </main>
+
+  <!-- App logic -->
+  <script src="app.js"></script>
+
+  <!-- Service worker registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker
+          .register('/service-worker.js')
+          .then(reg => console.log('Service worker registered', reg))
+          .catch(err => console.log('Service worker registration failed', err));
+      });
+    }
+  </script>
+</body>
+</html>
