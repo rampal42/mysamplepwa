@@ -1,12 +1,12 @@
 const CACHE_NAME = 'my-simple-pwa-v1';
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/app.js',
-  '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  '/mysamplepwa/',
+  '/mysamplepwa/index.html',
+  '/mysamplepwa/style.css',
+  '/mysamplepwa/app.js',
+  '/mysamplepwa/manifest.json',
+  '/mysamplepwa/icons/icon-192.png',
+  '/mysamplepwa/icons/icon-512.png'
 ];
 
 // Install event: cache files
