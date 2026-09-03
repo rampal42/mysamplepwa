@@ -11,6 +11,7 @@ const cameraView = document.getElementById('cameraView');
 const cameraVideo = document.getElementById('cameraVideo');
 const captureButton = document.getElementById('captureButton');
 const describeButton = document.getElementById('describeButton');
+const switchCameraButton = document.getElementById('switchCameraButton');
 const closeCameraButton = document.getElementById('closeCameraButton');
 const cameraStatus = document.getElementById('cameraStatus');
 const photoPreview = document.getElementById('photoPreview');
@@ -18,11 +19,13 @@ const description = document.getElementById('description');
 const settingsButton = document.getElementById('settingsButton');
 const settingsPanel = document.getElementById('settingsPanel');
 const apiKeyInput = document.getElementById('apiKeyInput');
+const openRouterModel = 'openrouter/free';
 let cameraStream;
 let previewUrl;
 let capturedPicture;
+let cameraFacingMode = 'environment';
 
-apiKeyInput.value = localStorage.getItem('geminiApiKey') || '';
+apiKeyInput.value = localStorage.getItem('openRouterApiKey') || '';
 
 settingsButton.addEventListener('click', () => {
   const isOpen = settingsPanel.hidden;
@@ -34,30 +37,50 @@ settingsButton.addEventListener('click', () => {
 });
 
 apiKeyInput.addEventListener('input', () => {
-  localStorage.setItem('geminiApiKey', apiKeyInput.value.trim());
+  localStorage.setItem('openRouterApiKey', apiKeyInput.value.trim());
 });
 
-cameraButton.addEventListener('click', async () => {
+cameraButton.addEventListener('click', () => startCamera());
+
+switchCameraButton.addEventListener('click', async () => {
+  cameraFacingMode = cameraFacingMode === 'environment' ? 'user' : 'environment';
+  await startCamera();
+});
+
+async function startCamera() {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     cameraStatus.textContent = 'Camera access is not supported by this browser.';
     return;
   }
 
+  const previousFacingMode = cameraFacingMode === 'environment' ? 'user' : 'environment';
+
   try {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      cameraStream = undefined;
+    }
+
     cameraStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: 'environment' } },
+      video: { facingMode: { exact: cameraFacingMode } },
       audio: false
     });
     cameraVideo.srcObject = cameraStream;
     cameraView.hidden = false;
     cameraButton.hidden = true;
     captureButton.hidden = false;
+    switchCameraButton.hidden = false;
+    switchCameraButton.textContent = cameraFacingMode === 'environment'
+      ? 'Use front camera'
+      : 'Use back camera';
     closeCameraButton.hidden = false;
     cameraStatus.textContent = '';
   } catch (error) {
+    cameraFacingMode = previousFacingMode;
+    stopCamera();
     cameraStatus.textContent = 'Unable to access the camera. Check browser permission and use HTTPS or localhost.';
   }
-});
+}
 
 captureButton.addEventListener('click', () => {
   if (!cameraVideo.videoWidth || !cameraVideo.videoHeight) {
@@ -99,7 +122,7 @@ describeButton.addEventListener('click', async () => {
     settingsPanel.hidden = false;
     settingsButton.setAttribute('aria-expanded', 'true');
     apiKeyInput.focus();
-    cameraStatus.textContent = 'Enter a Gemini API key in Settings first.';
+    cameraStatus.textContent = 'Enter an OpenRouter API key in Settings first.';
     return;
   }
 
@@ -114,31 +137,38 @@ describeButton.addEventListener('click', async () => {
 
   try {
     const imageData = await blobToBase64(capturedPicture);
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [
-              { text: 'Describe this image clearly and concisely.' },
-              { inline_data: { mime_type: capturedPicture.type, data: imageData } }
-            ]
-          }]
-        })
-      }
-    );
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: openRouterModel,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'text', text: 'Describe this image clearly and concisely.' },
+            {
+              type: 'image_url',
+              image_url: { url: `data:${capturedPicture.type};base64,${imageData}` }
+            }
+          ]
+        }]
+      })
+    });
 
     if (!response.ok) {
-      throw new Error(`API request failed with status ${response.status}`);
+      const errorResult = await response.json().catch(() => null);
+      const providerMessage = errorResult?.error?.message;
+      throw new Error(providerMessage || `API request failed with status ${response.status}`);
     }
 
     const result = await response.json();
-    const text = result.candidates?.[0]?.content?.parts
-      ?.map(part => part.text)
-      .filter(Boolean)
-      .join(' ');
+    const messageContent = result.choices?.[0]?.message?.content;
+    const text = typeof messageContent === 'string'
+      ? messageContent
+      : messageContent?.map(part => part.text).filter(Boolean).join(' ');
 
     if (!text) {
       throw new Error('The API returned no description.');
@@ -173,5 +203,6 @@ function stopCamera() {
   cameraView.hidden = true;
   cameraButton.hidden = false;
   captureButton.hidden = true;
+  switchCameraButton.hidden = true;
   closeCameraButton.hidden = true;
 }
