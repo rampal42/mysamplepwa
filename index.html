@@ -23,6 +23,18 @@
     <p>This is a simple Progressive Web App.</p>
     <button id="clickMe">Tap me</button>
     <p id="output"></p>
+
+    <section class="camera-section" aria-labelledby="camera-title">
+      <h2 id="camera-title">Take a picture</h2>
+      <button id="cameraButton" type="button">Open camera</button>
+      <div id="cameraView" hidden>
+        <video id="cameraVideo" autoplay playsinline aria-label="Live camera preview"></video>
+        <button id="captureButton" type="button">Take picture</button>
+        <button id="closeCameraButton" type="button">Close camera</button>
+      </div>
+      <p id="cameraStatus" role="status" aria-live="polite"></p>
+      <img id="photoPreview" alt="Your captured picture" hidden />
+    </section>
   </main>
 
   <!-- App logic -->
@@ -33,7 +45,7 @@
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker
-          .register('/mysamplepwa/service-worker.js')
+          .register('./service-worker.js')
           .then(reg => console.log('Service worker registered', reg))
           .catch(err => console.log('Service worker registration failed', err));
       });

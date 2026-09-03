@@ -16,6 +16,37 @@ main {
   padding: 1rem;
 }
 
+.camera-section {
+  margin-top: 2rem;
+  max-width: 32rem;
+}
+
+.camera-section h2 {
+  margin-bottom: 0.75rem;
+}
+
+#cameraView {
+  margin-top: 1rem;
+}
+
+#cameraVideo {
+  display: block;
+  width: 100%;
+  max-width: 32rem;
+  background: #111;
+  border-radius: 4px;
+}
+
+#captureButton,
+#closeCameraButton {
+  margin-top: 0.75rem;
+  margin-right: 0.5rem;
+}
+
+#cameraStatus {
+  color: #b3261e;
+}
+
 button {
   padding: 0.75rem 1.25rem;
   border: none;
@@ -28,4 +59,16 @@ button {
 
 button:active {
   transform: scale(0.97);
+}
+
+#photoPreview {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 1rem;
+  border-radius: 4px;
+}
+
+#photoPreview[hidden] {
+  display: none;
 }
