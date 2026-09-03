@@ -16,7 +16,15 @@
 </head>
 <body>
   <header>
-    <h1>My Simple PWA</h1>
+    <div class="header-content">
+      <h1>My Simple PWA</h1>
+      <button id="settingsButton" class="icon-button" type="button" aria-label="Settings" aria-expanded="false">&#9881;</button>
+    </div>
+    <div id="settingsPanel" class="settings-panel" hidden>
+      <label for="apiKeyInput">Gemini API key</label>
+      <input id="apiKeyInput" type="password" autocomplete="off" placeholder="Enter your API key" />
+      <p class="settings-note">Your key is stored only in this browser.</p>
+    </div>
   </header>
 
   <main>
@@ -26,14 +34,18 @@
 
     <section class="camera-section" aria-labelledby="camera-title">
       <h2 id="camera-title">Take a picture</h2>
-      <button id="cameraButton" type="button">Open camera</button>
+      <div class="camera-controls">
+        <button id="cameraButton" type="button">Start Camera</button>
+        <button id="captureButton" type="button" hidden>Take picture</button>
+        <button id="describeButton" type="button" hidden>Describe picture</button>
+        <button id="closeCameraButton" type="button" hidden>Close camera</button>
+      </div>
       <div id="cameraView" hidden>
         <video id="cameraVideo" autoplay playsinline aria-label="Live camera preview"></video>
-        <button id="captureButton" type="button">Take picture</button>
-        <button id="closeCameraButton" type="button">Close camera</button>
       </div>
       <p id="cameraStatus" role="status" aria-live="polite"></p>
       <img id="photoPreview" alt="Your captured picture" hidden />
+      <p id="description" aria-live="polite"></p>
     </section>
   </main>
 

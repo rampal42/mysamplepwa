@@ -12,6 +12,47 @@ header {
   text-align: center;
 }
 
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.header-content h1 {
+  margin: 0;
+}
+
+.icon-button {
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  background: transparent;
+  font-size: 1.5rem;
+}
+
+.settings-panel {
+  display: grid;
+  gap: 0.4rem;
+  max-width: 32rem;
+  margin: 1rem auto 0;
+  text-align: left;
+}
+
+.settings-panel input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid #c7c7c7;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.settings-note {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
 main {
   padding: 1rem;
 }
@@ -23,6 +64,12 @@ main {
 
 .camera-section h2 {
   margin-bottom: 0.75rem;
+}
+
+.camera-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 #cameraView {
@@ -37,14 +84,17 @@ main {
   border-radius: 4px;
 }
 
-#captureButton,
-#closeCameraButton {
-  margin-top: 0.75rem;
-  margin-right: 0.5rem;
-}
-
 #cameraStatus {
   color: #b3261e;
+}
+
+#description {
+  line-height: 1.5;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.7;
 }
 
 button {
