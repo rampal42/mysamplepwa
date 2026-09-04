@@ -72,6 +72,23 @@ main {
   gap: 0.5rem;
 }
 
+.prompt-label {
+  display: block;
+  margin-top: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+#promptInput {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid #c7c7c7;
+  border-radius: 4px;
+  font: inherit;
+  resize: vertical;
+}
+
 #cameraView {
   margin-top: 1rem;
 }
