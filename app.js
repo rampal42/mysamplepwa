@@ -11,7 +11,9 @@ const description = document.getElementById('description');
 const settingsButton = document.getElementById('settingsButton');
 const settingsPanel = document.getElementById('settingsPanel');
 const apiKeyInput = document.getElementById('apiKeyInput');
+const promptInput = document.getElementById('promptInput');
 const openRouterModel = 'openrouter/free';
+const defaultPrompt = 'Describe this image clearly and concisely.';
 let cameraStream;
 let previewUrl;
 let capturedPicture;
@@ -128,6 +130,7 @@ describeButton.addEventListener('click', async () => {
   description.textContent = '';
 
   try {
+    const prompt = promptInput.value.trim() || defaultPrompt;
     const imageData = await blobToBase64(capturedPicture);
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -140,7 +143,7 @@ describeButton.addEventListener('click', async () => {
         messages: [{
           role: 'user',
           content: [
-            { type: 'text', text: 'Describe this image clearly and concisely.' },
+            { type: 'text', text: prompt },
             {
               type: 'image_url',
               image_url: { url: `data:${capturedPicture.type};base64,${imageData}` }
