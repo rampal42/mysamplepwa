@@ -1,11 +1,3 @@
-const button = document.getElementById('clickMe');
-const output = document.getElementById('output');
-
-button.addEventListener('click', () => {
-  const now = new Date().toLocaleTimeString();
-  output.textContent = `Button tapped at ${now}`;
-});
-
 const cameraButton = document.getElementById('cameraButton');
 const cameraView = document.getElementById('cameraView');
 const cameraVideo = document.getElementById('cameraVideo');
