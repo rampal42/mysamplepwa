@@ -36,17 +36,23 @@ weightInput.value = localStorage.getItem('userWeight') || '';
 heightFeetInput.value = localStorage.getItem('userHeightFeet') || '';
 heightInchesInput.value = localStorage.getItem('userHeightInches') || '';
 
+function setSettingsOpen(isOpen) {
+  settingsOverlay.hidden = !isOpen;
+  settingsOverlay.classList.toggle('is-open', isOpen);
+  settingsOverlay.setAttribute('aria-hidden', String(!isOpen));
+  settingsButton.setAttribute('aria-expanded', String(isOpen));
+
+  if (isOpen) {
+    nameInput.focus();
+  }
+}
+
 function openSettings() {
-  settingsOverlay.hidden = false;
-  settingsOverlay.setAttribute('aria-hidden', 'false');
-  settingsButton.setAttribute('aria-expanded', 'true');
-  nameInput.focus();
+  setSettingsOpen(true);
 }
 
 function closeSettings() {
-  settingsOverlay.hidden = true;
-  settingsOverlay.setAttribute('aria-hidden', 'true');
-  settingsButton.setAttribute('aria-expanded', 'false');
+  setSettingsOpen(false);
 }
 
 settingsButton.addEventListener('click', () => {
