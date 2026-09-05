@@ -1,3 +1,4 @@
+const nameInput = document.getElementById('nameInput');
 const cameraButton = document.getElementById('cameraButton');
 const cameraView = document.getElementById('cameraView');
 const cameraVideo = document.getElementById('cameraVideo');
@@ -9,7 +10,13 @@ const cameraStatus = document.getElementById('cameraStatus');
 const photoPreview = document.getElementById('photoPreview');
 const description = document.getElementById('description');
 const settingsButton = document.getElementById('settingsButton');
-const settingsPanel = document.getElementById('settingsPanel');
+const settingsOverlay = document.getElementById('settingsOverlay');
+const closeSettingsButton = document.getElementById('closeSettingsButton');
+const ageInput = document.getElementById('ageInput');
+const sexInput = document.getElementById('sexInput');
+const weightInput = document.getElementById('weightInput');
+const heightFeetInput = document.getElementById('heightFeetInput');
+const heightInchesInput = document.getElementById('heightInchesInput');
 const apiKeyInput = document.getElementById('apiKeyInput');
 const promptInput = document.getElementById('promptInput');
 const openRouterModel = 'openrouter/free';
@@ -19,15 +26,76 @@ let previewUrl;
 let capturedPicture;
 let cameraFacingMode = 'environment';
 
+settingsOverlay.hidden = true;
+settingsOverlay.setAttribute('aria-hidden', 'true');
 apiKeyInput.value = localStorage.getItem('openRouterApiKey') || '';
+nameInput.value = localStorage.getItem('userName') || '';
+ageInput.value = localStorage.getItem('userAge') || '';
+sexInput.value = localStorage.getItem('userSex') || '';
+weightInput.value = localStorage.getItem('userWeight') || '';
+heightFeetInput.value = localStorage.getItem('userHeightFeet') || '';
+heightInchesInput.value = localStorage.getItem('userHeightInches') || '';
+
+function openSettings() {
+  settingsOverlay.hidden = false;
+  settingsOverlay.setAttribute('aria-hidden', 'false');
+  settingsButton.setAttribute('aria-expanded', 'true');
+  nameInput.focus();
+}
+
+function closeSettings() {
+  settingsOverlay.hidden = true;
+  settingsOverlay.setAttribute('aria-hidden', 'true');
+  settingsButton.setAttribute('aria-expanded', 'false');
+}
 
 settingsButton.addEventListener('click', () => {
-  const isOpen = settingsPanel.hidden;
-  settingsPanel.hidden = !isOpen;
-  settingsButton.setAttribute('aria-expanded', String(isOpen));
-  if (isOpen) {
-    apiKeyInput.focus();
+  if (settingsOverlay.hidden) {
+    openSettings();
+  } else {
+    closeSettings();
   }
+});
+
+closeSettingsButton.addEventListener('click', event => {
+  event.stopPropagation();
+  closeSettings();
+});
+
+settingsOverlay.addEventListener('click', event => {
+  if (event.target === settingsOverlay) {
+    closeSettings();
+  }
+});
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && !settingsOverlay.hidden) {
+    closeSettings();
+  }
+});
+
+nameInput.addEventListener('input', () => {
+  localStorage.setItem('userName', nameInput.value.trim());
+});
+
+ageInput.addEventListener('change', () => {
+  localStorage.setItem('userAge', ageInput.value);
+});
+
+sexInput.addEventListener('change', () => {
+  localStorage.setItem('userSex', sexInput.value);
+});
+
+weightInput.addEventListener('input', () => {
+  localStorage.setItem('userWeight', weightInput.value);
+});
+
+heightFeetInput.addEventListener('input', () => {
+  localStorage.setItem('userHeightFeet', heightFeetInput.value);
+});
+
+heightInchesInput.addEventListener('input', () => {
+  localStorage.setItem('userHeightInches', heightInchesInput.value);
 });
 
 apiKeyInput.addEventListener('input', () => {
@@ -113,8 +181,7 @@ describeButton.addEventListener('click', async () => {
   const apiKey = apiKeyInput.value.trim();
 
   if (!apiKey) {
-    settingsPanel.hidden = false;
-    settingsButton.setAttribute('aria-expanded', 'true');
+    openSettings();
     apiKeyInput.focus();
     cameraStatus.textContent = 'Enter an OpenRouter API key in Settings first.';
     return;
