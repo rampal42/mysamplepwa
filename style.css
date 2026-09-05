@@ -37,13 +37,22 @@ header {
 
 .settings-overlay {
   position: fixed;
-  inset: 0;
-  display: flex;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: none;
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 10;
+  z-index: 2147483647;
   padding: 1rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.settings-overlay.is-open {
+  display: flex;
 }
 
 .settings-panel {
