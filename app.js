@@ -9,6 +9,7 @@ const closeCameraButton = document.getElementById('closeCameraButton');
 const cameraStatus = document.getElementById('cameraStatus');
 const photoPreview = document.getElementById('photoPreview');
 const description = document.getElementById('description');
+const tokenUsage = document.getElementById('tokenUsage');
 const settingsButton = document.getElementById('settingsButton');
 const settingsOverlay = document.getElementById('settingsOverlay');
 const closeSettingsButton = document.getElementById('closeSettingsButton');
@@ -201,6 +202,8 @@ describeButton.addEventListener('click', async () => {
   describeButton.disabled = true;
   cameraStatus.textContent = 'Describing picture...';
   description.textContent = '';
+  tokenUsage.textContent = '';
+  tokenUsage.hidden = true;
 
   try {
     const prompt = promptInput.value.trim() || defaultPrompt;
@@ -222,7 +225,8 @@ describeButton.addEventListener('click', async () => {
               image_url: { url: `data:${capturedPicture.type};base64,${imageData}` }
             }
           ]
-        }]
+        }],
+        usage: { include: true }
       })
     });
 
@@ -243,6 +247,13 @@ describeButton.addEventListener('click', async () => {
     }
 
     description.textContent = text;
+    const usage = result.usage;
+    if (usage && Number.isFinite(usage.total_tokens)) {
+      const inputTokens = Number.isFinite(usage.prompt_tokens) ? usage.prompt_tokens : 0;
+      const outputTokens = Number.isFinite(usage.completion_tokens) ? usage.completion_tokens : 0;
+      tokenUsage.textContent = `Tokens used: ${usage.total_tokens} (input: ${inputTokens}, output: ${outputTokens})`;
+      tokenUsage.hidden = false;
+    }
     cameraStatus.textContent = '';
   } catch (error) {
     cameraStatus.textContent = 'Unable to describe the picture. Check the API key and try again.';
