@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Whats this ?</title>
+  <title>Food Calorie Check</title>
 
   <!-- Link to CSS -->
   <link rel="stylesheet" href="style.css" />
@@ -17,7 +17,7 @@
 <body>
   <header>
     <div class="header-content">
-      <h1>Whats in this Picture ?</h1>
+      <h1>Food Calorie Check</h1>
       <button id="settingsButton" class="icon-button" type="button" aria-label="Settings" aria-expanded="false">&#9881;</button>
     </div>
   </header>
@@ -159,6 +159,33 @@
         </div>
       </div>
 
+      <fieldset class="meal-allowances">
+        <legend>Meal calorie allowances</legend>
+        <div class="meal-allowance-fields">
+          <label for="breakfastAllowance">Breakfast (kcal)<input id="breakfastAllowance" data-meal-allowance="breakfast" type="number" min="0" step="25" value="400" /></label>
+          <label for="lunchAllowance">Lunch (kcal)<input id="lunchAllowance" data-meal-allowance="lunch" type="number" min="0" step="25" value="500" /></label>
+          <label for="snackAllowance">Snack (kcal)<input id="snackAllowance" data-meal-allowance="snack" type="number" min="0" step="25" value="200" /></label>
+          <label for="dinnerAllowance">Dinner (kcal)<input id="dinnerAllowance" data-meal-allowance="dinner" type="number" min="0" step="25" value="400" /></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="exercise-options">
+        <legend>Exercises</legend>
+        <label class="checkbox-option"><input type="checkbox" name="preferredExercises" value="Walking" /><span>Walking<output class="exercise-calorie-rate" data-exercise-rate="Walking"></output></span></label>
+        <label class="checkbox-option"><input type="checkbox" name="preferredExercises" value="Running" /><span>Running<output class="exercise-calorie-rate" data-exercise-rate="Running"></output></span></label>
+        <label class="checkbox-option"><input type="checkbox" name="preferredExercises" value="Cycling" /><span>Cycling<output class="exercise-calorie-rate" data-exercise-rate="Cycling"></output></span></label>
+        <label class="checkbox-option"><input type="checkbox" name="preferredExercises" value="Swimming" /><span>Swimming<output class="exercise-calorie-rate" data-exercise-rate="Swimming"></output></span></label>
+        <label class="checkbox-option"><input type="checkbox" name="preferredExercises" value="Strength training" /><span>Strength training<output class="exercise-calorie-rate" data-exercise-rate="Strength training"></output></span></label>
+        <label class="checkbox-option"><input type="checkbox" name="preferredExercises" value="Bodyweight training" /><span>Bodyweight training<output class="exercise-calorie-rate" data-exercise-rate="Bodyweight training"></output></span></label>
+        <label class="checkbox-option"><input type="checkbox" name="preferredExercises" value="Yoga" /><span>Yoga<output class="exercise-calorie-rate" data-exercise-rate="Yoga"></output></span></label>
+        <label class="checkbox-option"><input type="checkbox" name="preferredExercises" value="Pilates" /><span>Pilates<output class="exercise-calorie-rate" data-exercise-rate="Pilates"></output></span></label>
+        <label class="checkbox-option"><input type="checkbox" name="preferredExercises" value="Stretching" /><span>Stretching<output class="exercise-calorie-rate" data-exercise-rate="Stretching"></output></span></label>
+        <label class="checkbox-option"><input type="checkbox" name="preferredExercises" value="Hiking" /><span>Hiking<output class="exercise-calorie-rate" data-exercise-rate="Hiking"></output></span></label>
+        <label class="checkbox-option"><input type="checkbox" name="preferredExercises" value="Dance" /><span>Dance<output class="exercise-calorie-rate" data-exercise-rate="Dance"></output></span></label>
+        <label class="checkbox-option"><input type="checkbox" name="preferredExercises" value="Balance exercises" /><span>Balance exercises<output class="exercise-calorie-rate" data-exercise-rate="Balance exercises"></output></span></label>
+      </fieldset>
+      <p class="settings-note">Estimates use Schofield for ages 10–18 and Mifflin–St Jeor for ages 19+. Adult estimates use height; profiles under age 10 are not estimated. Decline to State uses average sex coefficients. Actual burn varies with intensity.</p>
+
       <label for="apiKeyInput">OpenRouter API key</label>
       <input id="apiKeyInput" type="password" autocomplete="off" placeholder="Enter your API key" />
       <p class="settings-note">Your key is stored only in this browser.</p>
@@ -167,25 +194,47 @@
 
   <main>
     <section class="camera-section" aria-labelledby="camera-title">
-      <h2 id="camera-title">Take a picture</h2>
+      <h2 id="camera-title">Estimate food calories</h2>
       <div class="camera-controls">
-        <button id="cameraButton" type="button">Start Camera</button>
-        <button id="captureButton" type="button" hidden>Take picture</button>
-        <button id="describeButton" type="button" hidden>Describe picture</button>
+        <button id="cameraButton" type="button">Take a food photo</button>
+        <button id="captureButton" type="button" hidden>Capture photo</button>
+        <button id="retryAnalysisButton" type="button" hidden>Retry analysis</button>
         <button id="switchCameraButton" type="button" hidden>Use front camera</button>
         <button id="closeCameraButton" type="button" hidden>Close camera</button>
       </div>
-      <label class="prompt-label" for="promptInput">Prompt</label>
-      <textarea id="promptInput" rows="3" placeholder="Describe this image clearly and concisely.">Describe this image clearly and concisely.</textarea>
       <div id="cameraView" hidden>
         <video id="cameraVideo" autoplay playsinline aria-label="Live camera preview"></video>
       </div>
       <p id="cameraStatus" role="status" aria-live="polite"></p>
-      <img id="photoPreview" alt="Your captured picture" hidden />
-      <p id="description" aria-live="polite"></p>
+      <img id="photoPreview" alt="Captured food" hidden />
+      <section id="foodAnalysis" class="food-analysis" aria-labelledby="foodAnalysisTitle" hidden>
+        <h2 id="foodAnalysisTitle" tabindex="-1">Food estimate</h2>
+        <p id="foodAnalysisSummary"></p>
+        <ul id="foodItems"></ul>
+        <p id="foodCalories" class="food-calories" hidden></p>
+        <div id="mealAllowanceSection" class="meal-allowance-comparison" hidden>
+          <h3>Meal allowance comparison</h3>
+          <ul id="mealAllowanceComparisons"></ul>
+        </div>
+        <div id="activityTimeSection" hidden>
+          <h3>Estimated activity time</h3>
+          <ul id="activityTimes"></ul>
+          <p class="settings-note">Approximate comparisons only. Food portions and exercise intensity can vary; this is not health or nutrition advice.</p>
+        </div>
+      </section>
       <p id="tokenUsage" aria-live="polite" hidden></p>
     </section>
   </main>
+
+  <div id="processingOverlay" class="processing-overlay" role="dialog" aria-modal="true" aria-labelledby="processingTitle" aria-hidden="true" hidden>
+    <section class="processing-panel">
+      <h2 id="processingTitle">Estimating food calories</h2>
+      <p>Checking the photo for food and calculating an approximate calorie estimate.</p>
+      <div class="processing-track" aria-hidden="true"><span></span></div>
+      <p id="processingElapsed" class="processing-elapsed" role="status" aria-live="off">Processing time: 0 seconds</p>
+      <button id="cancelAnalysisButton" type="button">Cancel and return</button>
+    </section>
+  </div>
 
   <!-- App logic -->
   <script src="app.js"></script>

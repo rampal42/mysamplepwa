@@ -59,6 +59,13 @@ header {
   display: grid;
   gap: 0.75rem;
   width: min(32rem, 100%);
+  max-height: calc(100vh - 2rem);
+  max-height: calc(100dvh - 2rem);
+  min-height: 0;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   background: white;
   border-radius: 12px;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
@@ -117,6 +124,70 @@ header {
   font-size: 0.9rem;
 }
 
+.meal-allowances {
+  margin: 0;
+  padding: 0.75rem;
+  border: 1px solid #c7c7c7;
+  border-radius: 4px;
+}
+
+.meal-allowances legend {
+  padding: 0 0.25rem;
+  font-weight: 600;
+}
+
+.meal-allowance-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.meal-allowance-fields label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+}
+
+.exercise-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 0.75rem;
+  margin: 0;
+  padding: 0.75rem;
+  border: 1px solid #c7c7c7;
+  border-radius: 4px;
+}
+
+.exercise-options legend {
+  padding: 0 0.25rem;
+  font-weight: 600;
+}
+
+.exercise-options .checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 400;
+}
+
+.checkbox-option > span {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.exercise-calorie-rate {
+  color: #555;
+  font-size: 0.8rem;
+}
+
+.settings-panel .exercise-options input[type="checkbox"] {
+  flex: 0 0 auto;
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  padding: 0;
+}
+
 .settings-note {
   margin: 0;
   font-size: 0.85rem;
@@ -142,23 +213,6 @@ main {
   gap: 0.5rem;
 }
 
-.prompt-label {
-  display: block;
-  margin-top: 1rem;
-  margin-bottom: 0.4rem;
-}
-
-#promptInput {
-  box-sizing: border-box;
-  display: block;
-  width: 100%;
-  padding: 0.7rem;
-  border: 1px solid #c7c7c7;
-  border-radius: 4px;
-  font: inherit;
-  resize: vertical;
-}
-
 #cameraView {
   margin-top: 1rem;
 }
@@ -175,8 +229,96 @@ main {
   color: #b3261e;
 }
 
-#description {
+.food-analysis {
+  max-width: 32rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #c7c7c7;
+}
+
+.processing-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.58);
+}
+
+.processing-panel {
+  width: min(24rem, 100%);
+  padding: 1.5rem;
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+  text-align: center;
+}
+
+.processing-panel h2 {
+  margin-top: 0;
+}
+
+.processing-track {
+  height: 0.35rem;
+  margin: 1.25rem 0 0.75rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e2e2e2;
+}
+
+.processing-track span {
+  display: block;
+  width: 35%;
+  height: 100%;
+  border-radius: inherit;
+  background: #2196f3;
+  animation: processing-progress 1.4s ease-in-out infinite alternate;
+}
+
+.processing-elapsed {
+  color: #555;
+  font-size: 0.9rem;
+}
+
+@keyframes processing-progress {
+  from { transform: translateX(-10%); }
+  to { transform: translateX(200%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .processing-track span {
+    width: 100%;
+    animation: none;
+    opacity: 0.6;
+  }
+}
+
+.food-analysis h2,
+.food-analysis h3 {
+  margin: 0 0 0.5rem;
+}
+
+.food-analysis ul {
+  padding-left: 1.25rem;
   line-height: 1.5;
+}
+
+.food-calories {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+#activityTimeSection {
+  margin-top: 1rem;
+}
+
+.meal-allowance-comparison {
+  margin-top: 1rem;
+}
+
+.meal-allowance-comparison h3 {
+  margin: 0 0 0.5rem;
 }
 
 #tokenUsage {
