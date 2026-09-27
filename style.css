@@ -213,6 +213,32 @@ main {
   gap: 0.5rem;
 }
 
+.upload-button {
+  position: relative;
+  display: inline-block;
+  box-sizing: border-box;
+  padding: 0.75rem 1.25rem;
+  border-radius: 4px;
+  background: #2196f3;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.upload-button input[type="file"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.upload-button:focus-within {
+  outline: 2px solid #0b57d0;
+  outline-offset: 2px;
+}
+
 #cameraView {
   margin-top: 1rem;
 }

@@ -1,5 +1,6 @@
 const nameInput = document.getElementById('nameInput');
 const cameraButton = document.getElementById('cameraButton');
+const uploadInput = document.getElementById('uploadInput');
 const cameraView = document.getElementById('cameraView');
 const cameraVideo = document.getElementById('cameraVideo');
 const captureButton = document.getElementById('captureButton');
@@ -254,6 +255,22 @@ apiKeyInput.addEventListener('input', () => {
 
 cameraButton.addEventListener('click', () => startCamera());
 
+uploadInput.addEventListener('change', () => {
+  const picture = uploadInput.files?.[0];
+  uploadInput.value = '';
+
+  if (!picture) {
+    return;
+  }
+
+  if (!picture.type.startsWith('image/')) {
+    cameraStatus.textContent = 'Choose an image file to analyze.';
+    return;
+  }
+
+  setPictureForAnalysis(picture);
+});
+
 switchCameraButton.addEventListener('click', async () => {
   cameraFacingMode = cameraFacingMode === 'environment' ? 'user' : 'environment';
   await startCamera();
@@ -315,24 +332,32 @@ captureButton.addEventListener('click', () => {
       return;
     }
 
-    capturedPicture = picture;
-    previewUrl = URL.createObjectURL(picture);
-    photoPreview.src = previewUrl;
-    photoPreview.hidden = false;
-    retryAnalysisButton.hidden = true;
-    foodAnalysis.hidden = true;
-    foodItems.replaceChildren();
-    foodCalories.hidden = true;
-    tokenUsage.hidden = true;
-    cameraStatus.textContent = '';
-    stopCamera();
-    analyzeCapturedFood();
+    setPictureForAnalysis(picture);
   }, 'image/jpeg', 0.9);
 });
 
 closeCameraButton.addEventListener('click', stopCamera);
 retryAnalysisButton.addEventListener('click', analyzeCapturedFood);
 cancelAnalysisButton.addEventListener('click', cancelFoodAnalysis);
+
+function setPictureForAnalysis(picture) {
+  capturedPicture = picture;
+  if (previewUrl) {
+    URL.revokeObjectURL(previewUrl);
+  }
+
+  previewUrl = URL.createObjectURL(picture);
+  photoPreview.src = previewUrl;
+  photoPreview.hidden = false;
+  retryAnalysisButton.hidden = true;
+  foodAnalysis.hidden = true;
+  foodItems.replaceChildren();
+  foodCalories.hidden = true;
+  tokenUsage.hidden = true;
+  cameraStatus.textContent = '';
+  stopCamera();
+  analyzeCapturedFood();
+}
 
 async function analyzeCapturedFood() {
   if (!capturedPicture) {
