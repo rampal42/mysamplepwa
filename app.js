@@ -31,9 +31,6 @@ const weightInput = document.getElementById('weightInput');
 const heightFeetInput = document.getElementById('heightFeetInput');
 const heightInchesInput = document.getElementById('heightInchesInput');
 const exerciseInputs = document.querySelectorAll('input[name="preferredExercises"]');
-const apiKeyInput = document.getElementById('apiKeyInput');
-const openRouterModel = 'openrouter/free';
-const foodAnalysisPrompt = `Check whether this image visibly contains food or a drink intended for consumption. If it does, identify each visible item and estimate its edible portion and calories from the image. Be conservative and explain uncertainty through approximate portions. Return only valid JSON in this exact shape: {"contains_food":true,"foods":[{"name":"food name","portion":"approximate portion","estimated_calories":123}],"note":"brief uncertainty note"}. Sum item calories yourself only if useful, but the app will calculate the displayed total from the item estimates. If no food or drink is visible, return {"contains_food":false,"foods":[],"note":"No food was identified."}. Do not invent hidden ingredients or claim precision from an image.`;
 const exerciseMetValues = {
   Walking: 3.5,
   Running: 8.3,
@@ -59,7 +56,7 @@ let processingTimer;
 
 settingsOverlay.hidden = true;
 settingsOverlay.setAttribute('aria-hidden', 'true');
-apiKeyInput.value = localStorage.getItem('openRouterApiKey') || '';
+localStorage.removeItem('openRouterApiKey');
 nameInput.value = localStorage.getItem('userName') || '';
 ageInput.value = localStorage.getItem('userAge') || '';
 sexInput.value = localStorage.getItem('userSex') || '';
@@ -249,10 +246,6 @@ mealAllowanceInputs.forEach(input => {
   input.addEventListener('change', saveMealCalorieAllowances);
 });
 
-apiKeyInput.addEventListener('input', () => {
-  localStorage.setItem('openRouterApiKey', apiKeyInput.value.trim());
-});
-
 cameraButton.addEventListener('click', () => startCamera());
 
 uploadInput.addEventListener('change', () => {
@@ -365,16 +358,6 @@ async function analyzeCapturedFood() {
     return;
   }
 
-  const apiKey = apiKeyInput.value.trim();
-
-  if (!apiKey) {
-    retryAnalysisButton.hidden = false;
-    openSettings();
-    apiKeyInput.focus();
-    cameraStatus.textContent = 'Enter an OpenRouter API key in Settings first.';
-    return;
-  }
-
   const controller = new AbortController();
   analysisController = controller;
   retryAnalysisButton.hidden = true;
@@ -385,34 +368,17 @@ async function analyzeCapturedFood() {
   showProcessingOverlay();
 
   try {
-    const imageData = await blobToBase64(capturedPicture);
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const imageDataUrl = await blobToImageDataUrl(capturedPicture);
+    const response = await fetch('/api/analyze-food', {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: openRouterModel,
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'text', text: foodAnalysisPrompt },
-            {
-              type: 'image_url',
-              image_url: { url: `data:${capturedPicture.type};base64,${imageData}` }
-            }
-          ]
-        }],
-        usage: { include: true }
-      }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: imageDataUrl }),
       signal: controller.signal
     });
 
     if (!response.ok) {
       const errorResult = await response.json().catch(() => null);
-      const providerMessage = errorResult?.error?.message;
-      throw new Error(providerMessage || `API request failed with status ${response.status}`);
+      throw new Error(errorResult?.error || `API request failed with status ${response.status}`);
     }
 
     const result = await response.json();
@@ -438,7 +404,7 @@ async function analyzeCapturedFood() {
     cameraStatus.textContent = '';
   } catch (error) {
     if (!controller.signal.aborted) {
-      cameraStatus.textContent = 'Unable to analyze this photo. Check your connection and API key, then try again.';
+      cameraStatus.textContent = 'Unable to analyze this photo. Check your connection, then try again.';
       retryAnalysisButton.hidden = false;
       console.error(error);
     }
@@ -588,12 +554,28 @@ function renderActivityTimes(totalCalories) {
   activityTimeSection.hidden = false;
 }
 
-function blobToBase64(blob) {
+async function blobToImageDataUrl(blob) {
+  const bitmap = await createImageBitmap(blob);
+  const maxDimension = 1600;
+  const scale = Math.min(1, maxDimension / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.round(bitmap.width * scale);
+  canvas.height = Math.round(bitmap.height * scale);
+  canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  bitmap.close();
+
+  const resizedBlob = await new Promise(resolve => {
+    canvas.toBlob(resolve, 'image/jpeg', 0.82);
+  });
+  if (!resizedBlob) {
+    throw new Error('The photo could not be prepared for upload.');
+  }
+
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result.split(',')[1]);
+    reader.onload = () => resolve(reader.result);
     reader.onerror = reject;
-    reader.readAsDataURL(blob);
+    reader.readAsDataURL(resizedBlob);
   });
 }
 

@@ -1,12 +1,13 @@
-const CACHE_NAME = 'my-simple-pwa-v9';
+const CACHE_NAME = 'my-simple-pwa-v10';
+const APP_ROOT = new URL('./', self.location.href);
 const ASSETS_TO_CACHE = [
-  '/mysamplepwa/',
-  '/mysamplepwa/index.html',
-  '/mysamplepwa/style.css',
-  '/mysamplepwa/app.js',
-  '/mysamplepwa/manifest.json',
-  '/mysamplepwa/icons/icon-192.png',
-  '/mysamplepwa/icons/icon-512.png'
+  APP_ROOT.href,
+  new URL('index.html', APP_ROOT).href,
+  new URL('style.css', APP_ROOT).href,
+  new URL('app.js', APP_ROOT).href,
+  new URL('manifest.json', APP_ROOT).href,
+  new URL('icons/icon-192.png', APP_ROOT).href,
+  new URL('icons/icon-512.png', APP_ROOT).href
 ];
 
 // Install event: cache files
@@ -63,7 +64,7 @@ self.addEventListener('fetch', event => {
         if (cachedResponse) {
           return cachedResponse;
         }
-        return caches.match('/mysamplepwa/index.html');
+        return caches.match(new URL('index.html', APP_ROOT).href);
       }))
   );
 });
